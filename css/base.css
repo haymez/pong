@@ -1,0 +1,23 @@
+/*Handles css for pong site*/
+
+.board {
+  position: relative;
+  background-color: gray;
+  border-radius: 15px;
+  width: 1000px;
+  height: 500px;
+}
+
+.paddle {
+  background-color: black;
+  height: 20px;
+  width: 60px;
+  position: absolute;
+  z-index: 1;
+  bottom: 0px;
+  left: 40%;
+}
+
+.center {
+  text-align: center;
+}

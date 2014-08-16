@@ -4,17 +4,15 @@
   position: relative;
   background-color: gray;
   border-radius: 15px;
-  width: 1000px;
-  height: 500px;
+  width: 100%;
+  padding: 18%;
 }
 
 .paddle {
-  background-color: black;
-  height: 20px;
-  width: 60px;
+  height: 5%;
+  width: 8%;
   position: absolute;
-  z-index: 1;
-  bottom: 0px;
+  bottom: 5px;
   left: 40%;
 }
 

@@ -1,4 +1,11 @@
-pong
+Pong
 ====
+---
+#### Language
+* JavaScript
 
-Simple Pong Game
+####Libraries:
+* **JQuery**
+* **Bootstrap**
+
+Got bored and made a simple pong game to learn more about game design.

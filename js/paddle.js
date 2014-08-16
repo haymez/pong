@@ -1,10 +1,11 @@
 // Code for paddle model
 
-var Paddle = function(nameSpace, id, left, right, color) {
+var Paddle = function(id, up, down, color, leftSide) {
   this.id = id;
-  this.left = left;
-  this.right = right;
+  this.up = up;
+  this.down = down;
   this.color = color;
+  this.leftSide = leftSide;
   this.moving = false;
   return this;
 }

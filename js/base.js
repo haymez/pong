@@ -4,11 +4,15 @@
 var Pong = function(nameSpace, paddles, balls) {
 
   var movePaddle = function(paddle, y) {
-    paddle.css('top', paddle.position().top + y);
+    var newPosition = paddle.position().top + y
+    var height = Number($('.' + nameSpace).css('height').replace('px', ''));
+    console.log(newPosition, height)
+    if(newPosition > 0 && newPosition < height*.8) paddle.css('top', newPosition);
   }
 
   var handleKeyPress = function(evt) {
     if(evt.which != 116) evt.preventDefault(); //Prevent default events unless f5 is pressed
+
     if(evt.which === 32) {
       launchBall();
       return;
@@ -38,28 +42,31 @@ var Pong = function(nameSpace, paddles, balls) {
 
   // Change the direction of a ball
   changeDirection = function(ballObj, yDirection) {
-    var radians = ballObj.direction * Math.PI / 180;
-    var x = ballObj.speed * Math.cos(radians);
-    var y = ballObj.speed * Math.sin(radians);
-    if(yDirection) y *= -1;
-    else x *= -1;
-    var newDirection = Math.atan(x/y);
-    ballObj.direction = newDirection * 180 / Math.PI;
+    if(yDirection) ballObj.direction *= -1;
+    else {
+      ballObj.direction = 180 - ballObj.direction;
+    }
   }
 
   // Handles collisions
   var handleCollisions = function(ballObj) {
     var board = $('.' + nameSpace);
-    var boardHeight = board.css('height').substring(0, board.css('height').length - 2);
-    var x = Math.round(Number(ballObj.position.x.substring(0, ballObj.position.x.length - 2)));
-    var y = Math.round(Number(ballObj.position.y.substring(0, ballObj.position.y.length - 2)));
+    var boardHeight = Number(board.css('height').replace('px', ''));
+    var boardWidth = Number(board.css('width').replace('px', ''));
+    var x = ballObj.position.x;
+    var y = ballObj.position.y;
     if(y <= 0) {
       changeDirection(ballObj, true);
     }
-    else if(y >= boardHeight) {
+    else if(y >= boardHeight - 20) {
       changeDirection(ballObj, true);
     }
-    // console.log('Position:', ballObj.position);
+    else if(x >= boardWidth - 20) {
+      changeDirection(ballObj, false);
+    }
+    else if (x <= 0) {
+      changeDirection(ballObj, false);
+    }
   }
 
   var moveBall = function(ballObj) {
@@ -79,8 +86,8 @@ var Pong = function(nameSpace, paddles, balls) {
 
     // Update ball position
     ballObj.position = {
-      x: ball.css('left'),
-      y: ball.css('top')
+      x: Math.round(Number(ball.css('left').replace('px', '')) * 100) / 100,
+      y: Math.round(Number(ball.css('top').replace('px', '')) * 100) / 100
     }
 
     handleCollisions(ballObj);
@@ -127,6 +134,6 @@ var Pong = function(nameSpace, paddles, balls) {
 var paddle = new Paddle('paddle1', 87, 83, 'blue', true);
 var paddle2 = new Paddle('paddle2', 38, 40, 'red', false);
 
-var ball = new Ball('ball1', 65, 3, {x: 400, y: 150}, 'black');
+var ball = new Ball('ball1', 35, 5, {x: 400, y: 150}, 'black');
 
 var pong = new Pong('board', [paddle, paddle2], [ball]);

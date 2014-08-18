@@ -167,8 +167,6 @@ var Pong = function(nameSpace, paddles, balls) {
   var launchBall = function() {
     var ball = balls.find(function(n) { return !n.launched });
     if(!ball) {
-      clearInterval(balls[0].launched);
-      balls[0].launched = false;
       return;
     }
     insertBall(ball);
@@ -196,5 +194,7 @@ var paddle = new Paddle('paddle1', 87, 83, 'red', true, 10);
 var paddle2 = new Paddle('paddle2', 38, 40, 'blue', false, 150);
 
 var ball = new Ball('ball1', 35, 5, {x: 400, y: 150}, 'black');
+var ball2 = new Ball('ball2', 127, 5, {x: 600, y: 150}, 'yellow');
+var ball3 = new Ball('ball3', 165, 5, {x: 600, y: 350}, 'orange');
 
-var pong = new Pong('board', [paddle, paddle2], [ball]);
+var pong = new Pong('board', [paddle, paddle2], [ball, ball2, ball3]);

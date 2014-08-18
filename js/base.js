@@ -2,12 +2,21 @@
 // Code for game model and rules
 
 var Pong = function(nameSpace, paddles, balls) {
-
-  var movePaddle = function(paddle, y) {
-    var newPosition = paddle.position().top + y
+  var leftSidePoints = 0;
+  var rightSidePoints = 0;
+  var movePaddle = function(paddleObj, y) {
+    var paddle = $('#' + paddleObj.id);
     var height = Number($('.' + nameSpace).css('height').replace('px', ''));
-    console.log(newPosition, height)
-    if(newPosition > 0 && newPosition < height*.8) paddle.css('top', newPosition);
+    var newPosition = paddleObj.y + y;
+    if(newPosition < height*.8) {
+      if(newPosition > 0) {
+        paddle.css('top', newPosition);
+        paddleObj.y = newPosition;
+      } else {
+        paddle.css('top', 0);
+        paddleObj.y = 0;
+      }
+    }
   }
 
   var handleKeyPress = function(evt) {
@@ -28,7 +37,7 @@ var Pong = function(nameSpace, paddles, balls) {
     if(paddleObj.up === evt.which) y = -8;
     else y = 8;
 
-    paddleObj.moving = setInterval(function() { movePaddle($('#' + paddleObj.id), y); }, 10)
+    paddleObj.moving = setInterval(function() { movePaddle(paddleObj, y); }, 10)
   }
   var stopMoving = function(evt) {
     var paddleObj = paddles.find(function(n) {
@@ -48,6 +57,52 @@ var Pong = function(nameSpace, paddles, balls) {
     }
   }
 
+  var overlapping = function(ballObj) {
+    var collision = false;
+    var ballX = ballObj.position.x;
+    var ballY = ballObj.position.y;
+    var board = $('.' + nameSpace);
+    var boardWidth = Number(board.css('width').replace('px', ''));
+    var boardHeight = Number(board.css('height').replace('px', ''));
+    var paddleWidth = boardWidth * .02;
+    var paddleHeight = boardHeight * .2;
+
+    var overlap = function(paddleObj) {
+      var paddle = $('#' + paddleObj.id);
+      var leftSide;
+      if(!paddleObj.leftSide) leftSide = paddle.position().left - paddleWidth;
+      else leftSide = paddle.position().left;
+      var topSide = paddle.position().top;
+      if(ballX >= leftSide && ballX <= leftSide+paddleWidth) {
+        if(ballY >= topSide && ballY <= topSide + paddleHeight) {
+          collision = true;
+          ballObj.speed += .2;
+          return false; // Break out of loop
+        }
+      }
+    }
+
+    paddles.each(overlap);
+    return collision;
+  }
+
+  var score = function(side, ballObj) {
+    var scoreboard = $('#' + side);
+    console.log(side);
+    if(side === 'left') {
+      leftSidePoints++;
+      scoreboard.html(leftSidePoints);
+    } else {
+      rightSidePoints++;
+      scoreboard.html(rightSidePoints);
+    }
+    $('#' + ballObj.id).remove();
+    clearInterval(ballObj.launched);
+    ballObj.launched = false;
+    ballObj.position = {x: 250, y: 250};
+    ballObj.speed = 5;
+  }
+
   // Handles collisions
   var handleCollisions = function(ballObj) {
     var board = $('.' + nameSpace);
@@ -62,9 +117,14 @@ var Pong = function(nameSpace, paddles, balls) {
       changeDirection(ballObj, true);
     }
     else if(x >= boardWidth - 20) {
-      changeDirection(ballObj, false);
+      score('left', ballObj);
+      // changeDirection(ballObj, false);
     }
     else if (x <= 0) {
+      score('right', ballObj);
+      // changeDirection(ballObj, false);
+    }
+    else if(overlapping(ballObj)) {
       changeDirection(ballObj, false);
     }
   }
@@ -123,6 +183,7 @@ var Pong = function(nameSpace, paddles, balls) {
     element.style.backgroundColor = paddle.color;
     if(paddle.leftSide) element.style.left = '10px';
     else element.style.right = '10px';
+    element.style.top = paddle.y + 'px';
     $('.' + nameSpace).append(element);
   }
   paddles.each(insertPaddle);  
@@ -131,8 +192,8 @@ var Pong = function(nameSpace, paddles, balls) {
   $(document.body).on('keyup', stopMoving);
 }
 
-var paddle = new Paddle('paddle1', 87, 83, 'blue', true);
-var paddle2 = new Paddle('paddle2', 38, 40, 'red', false);
+var paddle = new Paddle('paddle1', 87, 83, 'red', true, 10);
+var paddle2 = new Paddle('paddle2', 38, 40, 'blue', false, 150);
 
 var ball = new Ball('ball1', 35, 5, {x: 400, y: 150}, 'black');
 
